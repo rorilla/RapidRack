@@ -4,6 +4,7 @@ import datasets
 import questionary
 import argparse
 import json
+import ast
 
 torch.set_grad_enabled(False)
 
@@ -31,12 +32,11 @@ def suggest_commands(user_input):
         
     scores, results = ds.get_nearest_examples(COLUMN, question_embedding, k=5)
 
-    list_choices = [f"{res['domain']}: {res['query'][:80]}..." for res in results]
+    list_choices = [f'{i}: {j}'[:100] + '...' for i,j in zip(results['domain'], results['query'])]
     choice = questionary.select("", choices=list_choices).ask()
     
-    selected_data = results[list_choices.index(choice)]
-    chosen = selected_data['query'] + '\n\n' + selected_data['api_list']
-    return chosen
+    choice_idx = list_choices.index(choice)
+    return results['query'][choice_idx], results['api_list'][choice_idx]
 
 def main():
     parser = argparse.ArgumentParser(description='rack CLI')
@@ -45,5 +45,11 @@ def main():
     args = parser.parse_args()
 
     sentence = ' '.join(args.user_input)  # Join the list of words to form the sentence
-    chosen = suggest_commands(sentence)
-    questionary.print(chosen)
+    chosen_query, chosen_api_list = suggest_commands(sentence)
+    # questionary.print(chosen)
+    print(chosen_query)
+    print()
+    print(json.dumps(ast.literal_eval(chosen_api_list), indent=2))
+    
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,1 @@
+{"column": "embedding", "prompt": "Represent the Stackoverflow question for retrieving corresponding codes: ", "model_path": "bin/model.bin", "dataset_path": "bin/dataset.bin", "faiss_path": "bin/faiss.bin"}
